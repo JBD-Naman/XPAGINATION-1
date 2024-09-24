@@ -70,9 +70,16 @@ const App = () => {
         </tbody>
       </table>
       <div className="buttoncontainer">
-        <button onClick={previousPage}>Previous</button>
+        <button onClick={previousPage} disabled={currentPage === 1}>
+          Previous
+        </button>
         <button> {currentPage} </button>
-        <button onClick={nextPage}>Next</button>
+        <button
+          onClick={nextPage}
+          disabled={currentPage === Math.ceil(employees.length / itemsPerPage)}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
