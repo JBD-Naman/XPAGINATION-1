@@ -25,25 +25,17 @@ const App = () => {
     fetchData();
   }, []);
 
-  // Calculate the index of the first item of the current page
+  const totalPages = Math.ceil(employees.length / itemsPerPage);
   const indexOfLastEmployee = currentPage * itemsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-  const currentEmployees = employees.slice(
-    indexOfFirstEmployee,
-    indexOfLastEmployee
-  );
+  const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
 
-  // Handle page change
-  const nextPage = () => {
-    if (currentPage < Math.ceil(employees.length / itemsPerPage)) {
-      setCurrentPage(currentPage + 1);
-    }
+  const handleNext = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
   };
 
-  const previousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+  const handlePrevious = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
   return (
@@ -59,8 +51,8 @@ const App = () => {
           </tr>
         </thead>
         <tbody>
-          {currentEmployees.map((employee, index) => (
-            <tr key={index}>
+          {currentEmployees.map((employee) => (
+            <tr key={employee.id}>
               <td>{employee.id}</td>
               <td>{employee.name}</td>
               <td>{employee.email}</td>
@@ -69,14 +61,22 @@ const App = () => {
           ))}
         </tbody>
       </table>
+
       <div className="buttoncontainer">
-        <button onClick={previousPage} disabled={currentPage === 1}>
+        <button
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+          aria-label="Previous Page"
+        >
           Previous
         </button>
-        <button> {currentPage} </button>
+
+        <span data-testid="current-page">{currentPage}</span>
+
         <button
-          onClick={nextPage}
-          disabled={currentPage === Math.ceil(employees.length / itemsPerPage)}
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          aria-label="Next Page"
         >
           Next
         </button>
