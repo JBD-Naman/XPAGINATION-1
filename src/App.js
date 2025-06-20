@@ -28,20 +28,18 @@ const App = () => {
   const totalPages = Math.ceil(employees.length / itemsPerPage);
   const indexOfLastEmployee = currentPage * itemsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-  const currentEmployees = employees.slice(
-    indexOfFirstEmployee,
-    indexOfLastEmployee
-  );
+  const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
 
+  // Handle page change
   const nextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
+    if (currentPage < Math.ceil(employees.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
   const previousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
+      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -64,7 +62,7 @@ const App = () => {
         </thead>
         <tbody>
           {currentEmployees.map((employee, index) => (
-            <tr key={employee.id}>
+            <tr key={index}>
               <td>{employee.id}</td>
               <td>{employee.name}</td>
               <td>{employee.email}</td>
@@ -75,29 +73,13 @@ const App = () => {
       </table>
 
       <div className="buttoncontainer">
-        <button
-          data-testid="pagination-prev"
-          onClick={previousPage}
-          disabled={currentPage === 1}
-        >
+        <button onClick={previousPage} disabled={currentPage === 1}>
           Previous
         </button>
-
-        {[...Array(totalPages)].map((_, index) => (
-          <button
-            key={index}
-            data-testid={`pagination-page-${index + 1}`}
-            onClick={() => goToPage(index + 1)}
-            className={currentPage === index + 1 ? "active-page" : ""}
-          >
-            {index + 1}
-          </button>
-        ))}
-
+        <button> {currentPage} </button>
         <button
-          data-testid="pagination-next"
           onClick={nextPage}
-          disabled={currentPage === totalPages}
+          disabled={currentPage === Math.ceil(employees.length / itemsPerPage)}
         >
           Next
         </button>
