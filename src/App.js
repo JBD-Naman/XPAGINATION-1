@@ -25,7 +25,7 @@ const App = () => {
     fetchData();
   }, []);
 
-  // Calculate the index of the first item of the current page
+  const totalPages = Math.ceil(employees.length / itemsPerPage);
   const indexOfLastEmployee = currentPage * itemsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
   const currentEmployees = employees.slice(
@@ -33,23 +33,27 @@ const App = () => {
     indexOfLastEmployee
   );
 
-  // Handle page change
   const nextPage = () => {
-    if (currentPage < Math.ceil(employees.length / itemsPerPage)) {
-      setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
   const previousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      setCurrentPage((prev) => prev - 1);
     }
+  };
+
+  const goToPage = (pageNum) => {
+    setCurrentPage(pageNum);
   };
 
   return (
     <div>
       <h1>Employee Data Table</h1>
-      <table>
+
+      <table data-testid="data-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -60,7 +64,7 @@ const App = () => {
         </thead>
         <tbody>
           {currentEmployees.map((employee, index) => (
-            <tr key={index}>
+            <tr key={employee.id}>
               <td>{employee.id}</td>
               <td>{employee.name}</td>
               <td>{employee.email}</td>
@@ -69,14 +73,31 @@ const App = () => {
           ))}
         </tbody>
       </table>
+
       <div className="buttoncontainer">
-        <button onClick={previousPage} disabled={currentPage === 1}>
+        <button
+          data-testid="pagination-prev"
+          onClick={previousPage}
+          disabled={currentPage === 1}
+        >
           Previous
         </button>
-        <button> {currentPage} </button>
+
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index}
+            data-testid={`pagination-page-${index + 1}`}
+            onClick={() => goToPage(index + 1)}
+            className={currentPage === index + 1 ? "active-page" : ""}
+          >
+            {index + 1}
+          </button>
+        ))}
+
         <button
+          data-testid="pagination-next"
           onClick={nextPage}
-          disabled={currentPage === Math.ceil(employees.length / itemsPerPage)}
+          disabled={currentPage === totalPages}
         >
           Next
         </button>
