@@ -1,41 +1,36 @@
-h1, button {
+h1, .pagination {
   text-align: center;
 }
 
 table {
   width: 100%;
-  border-bottom: 2px solid #019879;
   border-collapse: collapse;
   margin: 20px 0;
   font-size: 16px;
-  text-align: left;
-  padding: 5px;
 }
 
-th,
-td {
+th, td {
   padding: 12px;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
 th {
-  background-color: #019879; /* Green background */
-  color: white; /* White text */
-}
-
-.buttoncontainer {
-  text-align: center;
+  background-color: #019879;
+  color: white;
 }
 
 button {
-  color: white;
-  padding: 5px 15px;
-  border: none;
-  margin: 8px;
-  border-radius: 5px;
   background-color: #019879;
+  color: white;
+  padding: 8px 16px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-  + :nth-of-type(2) {
-    padding: 10px 15px;
-  }
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
