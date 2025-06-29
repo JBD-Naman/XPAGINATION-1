@@ -4,40 +4,42 @@ import "./App.css";
 function App() {
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const recordsPerPage = 10;
 
-  const fetchData = async (page) => {
-    try {
-      const response = await fetch(
-        `https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json();
-      const pageSize = 10;
-      const total = Math.ceil(data.length / pageSize);
-
-      const startIndex = (page - 1) * pageSize;
-      const paginatedData = data.slice(startIndex, startIndex + pageSize);
-
-      setEmployees(paginatedData);
-      setTotalPages(total);
-    } catch (error) {
-      alert("Failed to fetch data");
-    }
-  };
-
+  // Fetch all data once
   useEffect(() => {
-    fetchData(currentPage);
-  }, [currentPage]);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        setEmployees(data);
+      } catch (error) {
+        alert("Failed to fetch data");
+      }
+    };
+    fetchData();
+  }, []);
 
+  const totalPages = Math.ceil(employees.length / recordsPerPage);
+
+  // Calculate current page's records
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = employees.slice(indexOfFirstRecord, indexOfLastRecord);
+
+  // Handle next page
   const handleNext = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => prev + 1);
     }
   };
 
+  // Handle previous page
   const handlePrevious = () => {
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
@@ -47,7 +49,7 @@ function App() {
   return (
     <div className="App">
       <h1>Employee Data</h1>
-      <table border="1">
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -57,8 +59,8 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {employees.length > 0 ? (
-            employees.map((emp) => (
+          {currentRecords.length > 0 ? (
+            currentRecords.map((emp) => (
               <tr key={emp.id}>
                 <td>{emp.id}</td>
                 <td>{emp.name}</td>
