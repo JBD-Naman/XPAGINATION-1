@@ -25,13 +25,10 @@ const App = () => {
     fetchData();
   }, []);
 
-  // Calculate the index of the first item of the current page
+  const totalPages = Math.ceil(employees.length / itemsPerPage);
   const indexOfLastEmployee = currentPage * itemsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-  const currentEmployees = employees.slice(
-    indexOfFirstEmployee,
-    indexOfLastEmployee
-  );
+  const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
 
   // Handle page change
   const nextPage = () => {
@@ -46,10 +43,15 @@ const App = () => {
     }
   };
 
+  const goToPage = (pageNum) => {
+    setCurrentPage(pageNum);
+  };
+
   return (
     <div>
       <h1>Employee Data Table</h1>
-      <table>
+
+      <table data-testid="data-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -69,6 +71,7 @@ const App = () => {
           ))}
         </tbody>
       </table>
+
       <div className="buttoncontainer">
         <button onClick={previousPage} disabled={currentPage === 1}>
           Previous
