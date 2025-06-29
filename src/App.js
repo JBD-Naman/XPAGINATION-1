@@ -1,57 +1,53 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 
-const App = () => {
+function App() {
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchData = async (page) => {
+    try {
+      const response = await fetch(
+        `https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      const pageSize = 10;
+      const total = Math.ceil(data.length / pageSize);
+
+      const startIndex = (page - 1) * pageSize;
+      const paginatedData = data.slice(startIndex, startIndex + pageSize);
+
+      setEmployees(paginatedData);
+      setTotalPages(total);
+    } catch (error) {
+      alert("Failed to fetch data");
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          "https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json"
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setEmployees(data);
-      } catch (error) {
-        alert("Failed to fetch data");
-      }
-    };
+    fetchData(currentPage);
+  }, [currentPage]);
 
-    fetchData();
-  }, []);
-
-  const totalPages = Math.ceil(employees.length / itemsPerPage);
-  const indexOfLastEmployee = currentPage * itemsPerPage;
-  const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-  const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
-
-  // Handle page change
-  const nextPage = () => {
-    if (currentPage < Math.ceil(employees.length / itemsPerPage)) {
-      setCurrentPage(currentPage + 1);
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
-  const previousPage = () => {
+  const handlePrevious = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      setCurrentPage((prev) => prev - 1);
     }
-  };
-
-  const goToPage = (pageNum) => {
-    setCurrentPage(pageNum);
   };
 
   return (
-    <div>
-      <h1>Employee Data Table</h1>
-
-      <table data-testid="data-table">
+    <div className="App">
+      <h1>Employee Data</h1>
+      <table border="1">
         <thead>
           <tr>
             <th>ID</th>
@@ -61,31 +57,37 @@ const App = () => {
           </tr>
         </thead>
         <tbody>
-          {currentEmployees.map((employee, index) => (
-            <tr key={index}>
-              <td>{employee.id}</td>
-              <td>{employee.name}</td>
-              <td>{employee.email}</td>
-              <td>{employee.role}</td>
+          {employees.length > 0 ? (
+            employees.map((emp) => (
+              <tr key={emp.id}>
+                <td>{emp.id}</td>
+                <td>{emp.name}</td>
+                <td>{emp.email}</td>
+                <td>{emp.role}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">No data available</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
 
-      <div className="buttoncontainer">
-        <button onClick={previousPage} disabled={currentPage === 1}>
+      {/* Pagination Controls */}
+      <div className="pagination">
+        <button onClick={handlePrevious} disabled={currentPage === 1}>
           Previous
         </button>
-        <button> {currentPage} </button>
-        <button
-          onClick={nextPage}
-          disabled={currentPage === Math.ceil(employees.length / itemsPerPage)}
-        >
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button onClick={handleNext} disabled={currentPage === totalPages}>
           Next
         </button>
       </div>
     </div>
   );
-};
+}
 
 export default App;
